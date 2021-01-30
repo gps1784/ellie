@@ -4,6 +4,8 @@
 
 #include <gtest/gtest.h>
 
+#include <string>
+
 #include <ellie/op.h>
 
 TEST(EllieOpcodeTest, SizeShouldBe8) {
@@ -16,18 +18,6 @@ TEST(EllieOpcodeTest, SizeShouldBe16) {
   const size_t  width = 16;
   ellie::op<width> op = ellie::op<width>();
   EXPECT_EQ(width, op.size());
-}
-
-TEST(EllieOpcodeTest, ShouldConstructWithoutMask) {
-  const size_t  width = 8;
-  ellie::op<width> op = ellie::op<width>(0b0000'0000);
-  EXPECT_TRUE(true);
-}
-
-TEST(EllieOpcodeTest, ShouldConstructWithLiterals) {
-  const size_t  width = 8;
-  ellie::op<width> op = ellie::op<width>(0b0000'0000, 0b1111'0000);
-  EXPECT_TRUE(true);
 }
 
 TEST(EllieOpcodeTest, UnmaskedComparisonShouldPass) {
@@ -48,4 +38,11 @@ TEST(EllieOpcodeTest, MaskedComparisonShouldPass) {
   EXPECT_TRUE( op == rhs1 );
   EXPECT_TRUE( op == rhs2 );
   EXPECT_TRUE( op != rhs3 );
+}
+
+TEST(EllieOpcodeTest, InspectShouldCreateString) {
+  const size_t      width = 8;
+  ellie::op<width>     op = ellie::op<width>(0b0000'0000, 0b1111'0000);
+  std::string  s_expected = "< value:0b00000000 mask:0b11110000 size: 8 bits>";
+  EXPECT_EQ(op.inspect(), s_expected);
 }

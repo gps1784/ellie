@@ -5,6 +5,8 @@
 #define ELLIE_OP_H
 
 #include <bitset>
+#include <string>
+#include <iostream>
 
 namespace ellie {
   template<size_t N>
@@ -21,11 +23,12 @@ namespace ellie {
     op(void);
     template<typename N_size> op(N_size);
     template<typename N_size> op(N_size, N_size);
-    bool operator==(const std::bitset<N>&) const;
-    bool operator!=(const std::bitset<N>&) const;
-    bool operator[](size_t) const;
-    bool       test(size_t) const;
-    const size_t size(void);
+    bool     operator==(const std::bitset<N>&) const;
+    bool     operator!=(const std::bitset<N>&) const;
+    bool     operator[](size_t) const;
+    bool           test(size_t) const;
+    std::string inspect(void) const;
+    const size_t   size(void);
 
   protected:
   private:
@@ -52,19 +55,23 @@ namespace ellie {
     this->value = std::bitset<N>(i_value);
   }
 
-  template<size_t N> bool op<N>::operator==(const std::bitset<N>& rhs) const {
+  template<size_t N>
+  bool op<N>::operator==(const std::bitset<N>& rhs) const {
     return this->value == (rhs & this->mask);
   }
 
-  template<size_t N> bool op<N>::operator!=(const std::bitset<N>& rhs) const {
+  template<size_t N>
+  bool op<N>::operator!=(const std::bitset<N>& rhs) const {
     return this->value != (rhs & this->mask);
   }
 
-  template<size_t N> bool op<N>::operator[](size_t pos) const {
+  template<size_t N>
+  bool op<N>::operator[](size_t pos) const {
     return this->value[pos];
   }
 
-  template<size_t N> bool op<N>::test(size_t pos) const {
+  template<size_t N>
+  bool op<N>::test(size_t pos) const {
     return this->value.test(pos);
   }
 
@@ -75,8 +82,23 @@ namespace ellie {
 
      template<size_t N> const size_t (& op<N>::size)(void) = this->bits.size();
   */
-  template<size_t N> const size_t op<N>::size(void) {
+  template<size_t N>
+  const size_t op<N>::size(void) {
     return this->mask.size();
+  }
+
+  template<size_t N>
+  std::string op<N>::inspect(void) const {
+    return std::string("<") + " value:0b" +
+    this->value.to_string() + " mask:0b" +
+    this->mask.to_string() + " size: " +
+    std::to_string(this->mask.size()) + " bits" +
+    ">";
+  }
+
+  template<size_t N>
+  std::ostream& operator<<(std::ostream& p_ostream, const op<N> p_op) {
+    return (p_ostream << p_op.inspect());
   }
 }
 
