@@ -85,6 +85,8 @@ pedantic: CFLAGS   += -Wextra -Wpedantic
 pedantic: CXXFLAGS += -Wextra -Wpedantic
 clean:
 	$(RM) -rf $(BIN) $(BUILD)
+todo:
+	grep -rn "TODO" include/ src/ test/
 
 # If .cc (c++) files are being used, attach googletest (GTEST)
 # GTEST has associated creation, cleanup, and libraries
@@ -135,11 +137,11 @@ $(BUILD)/%.o: %$(LANG)
 
 # Do *NOT* include the dependencies if we are "clean"ing on this pass.
 # This corrects the behavior in case you type `make clean rebuild all`
-ifeq ($(findstring clean, $(MAKECMDGOALS)),)
+ifeq ($(findstring clean, $(MAKECMDGOALS))$(findstring todo, $(MAKECMDGOALS)),)
   include $(SRC_DEPS) $(TEST_DEPS)
 endif
 
-.PHONY: all run test debug pedantic clean distclean
+.PHONY: all run test debug pedantic clean distclean todo
 .PHONY: build-src build-test build-googletest
 .PHONY: exec-src exec-test
 .PHONY: clean-googletest
