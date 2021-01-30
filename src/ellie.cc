@@ -1,5 +1,8 @@
-#include <example.h>
-#include "example.h"
+/* ellie.cc
+ *
+ */
+
+#include <ellie.h>
 
 int main(int argc, char *argv[]) {
   return 0;

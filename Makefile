@@ -21,6 +21,7 @@ LDLIBS   :=
 # "Special" settings for Windows,
 # but this makefile is only tested with Windows 10
 ifeq ($(OS), Windows_NT)
+  TARGET_TEST_OPTS += --gtest_color=no
   EXE     := .exe
   #LDFLAGS += -lmingw32
   ifeq ($(findstring debug, $(MAKECMDGOALS)),)
@@ -28,12 +29,22 @@ ifeq ($(OS), Windows_NT)
   endif
 endif
 
+# MAKE IS TOO POWERFUL.
+# If make restarts too quickly, it will complain about clock skew
+# If a .d file is created in the same second make restarts, it may complain
+# This forces it to sleep for two seconds on all restarts, bypassing the issue
+ifneq ($(MAKE_RESTARTS),)
+  $(shell sleep 2)
+endif
+
 # Alter the target name to match the src/example.c
-TARGET_NAME := example
+TARGET_NAME := ellie
 TARGET_SRC  := $(BIN)/$(SRC)/$(TARGET_NAME)
 TARGET_TEST := $(BIN)/$(TEST)/$(TARGET_NAME)
 TARGET_SRC_EXE  := $(TARGET_SRC)$(EXE)
 TARGET_TEST_EXE := $(TARGET_TEST)$(EXE)
+TARGET_SRC_OPTS  +=
+TARGET_TEST_OPTS += --gtest_shuffle #--gtest_print_time=0
 
 # Both src/ and test/ have an example.cc file  -> ..._CORE
 # Anything under src/example/ or test/example/ -> ..._ALL
@@ -65,9 +76,9 @@ BUILD_TEST_DIRS := $(sort $(dir $(TEST_OBJ_CORE) $(TEST_OBJ_ALL)))
 
 all: exec-src
 run: exec-src
-	$(TARGET_SRC_EXE)
+	$(TARGET_SRC_EXE) $(TARGET_SRC_OPTS)
 test: exec-test
-	$(TARGET_TEST_EXE)
+	$(TARGET_TEST_EXE) $(TARGET_TEST_OPTS)
 debug:    CFLAGS   += -g
 debug:    CXXFLAGS += -g
 pedantic: CFLAGS   += -Wextra -Wpedantic
@@ -86,7 +97,7 @@ ifeq ($(LANG), .cc)
   exec-test: build-googletest
   build-googletest:
 		$(MAKE) -C $(GTEST)/make gtest_main.a
-  clean: clean-googletest
+  distclean: clean-googletest
   clean-googletest:
 		$(MAKE) -C $(GTEST)/make clean
 endif
@@ -128,7 +139,7 @@ ifeq ($(findstring clean, $(MAKECMDGOALS)),)
   include $(SRC_DEPS) $(TEST_DEPS)
 endif
 
-.PHONY: all run test debug pedantic clean
+.PHONY: all run test debug pedantic clean distclean
 .PHONY: build-src build-test build-googletest
 .PHONY: exec-src exec-test
 .PHONY: clean-googletest
