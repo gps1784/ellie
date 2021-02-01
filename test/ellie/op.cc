@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include <ellie/op.h>
+#include <ellie/op.hh>
 
 class EllieOpcodeTest : public testing::Test {
 protected:

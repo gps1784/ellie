@@ -2,4 +2,4 @@
  *
  */
 
-#include <ellie/reg.h>
+#include <ellie/reg.hh>

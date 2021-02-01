@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include <ellie/reg.h>
+#include <ellie/reg.hh>
 
 TEST(EllieRegisterTest, SizeShouldBe8) {
   const size_t    width = 8;
