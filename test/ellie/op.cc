@@ -8,41 +8,45 @@
 
 #include <ellie/op.h>
 
-TEST(EllieOpcodeTest, SizeShouldBe8) {
-  const size_t  width = 8;
-  ellie::op<width> op = ellie::op<width>("NUL", 0b0000);
-  EXPECT_EQ(width, op.size());
+class EllieOpcodeTest : public testing::Test {
+protected:
+  const static size_t w8  = 8;
+  const static size_t w16 = 16;
+  const ellie::op<w8>  op_w8_nomask  = ellie::op<w8> ("XXX", 0b0000);
+  const ellie::op<w16> op_w16_nomask = ellie::op<w16>("XXX", 0b0000);
+  const ellie::op<w8>  op_w8_masklow = ellie::op<w8> ("XXX", 0b0000'0000, 0b1111'0000);
+  const std::bitset<w8> bs_w8_zero     = std::bitset<w8>(0b0000'0000);
+  const std::bitset<w8> bs_w8_lowbits  = std::bitset<w8>(0b0000'1111);
+  const std::bitset<w8> bs_w8_highbits = std::bitset<w8>(0b1111'0000);
+  const std::string    op_w8_topmask_str = "<ellie::op XXX value:0b00000000 mask:0b11110000 size: 8 bits>";
+};
+
+TEST_F(EllieOpcodeTest, SizeShouldBe8) {
+  EXPECT_EQ(8, op_w8_nomask.size());
 }
 
-TEST(EllieOpcodeTest, SizeShouldBe16) {
-  const size_t  width = 16;
-  ellie::op<width> op = ellie::op<width>("NUL", 0b0000);
-  EXPECT_EQ(width, op.size());
+TEST_F(EllieOpcodeTest, SizeShouldBe16) {
+  EXPECT_EQ(16, op_w16_nomask.size());
 }
 
-TEST(EllieOpcodeTest, UnmaskedComparisonShouldPass) {
-  const size_t      width = 8;
-  ellie::op<width>     op = ellie::op<width>("XXX", 0b0000'0000);
-  std::bitset<width> rhs1 = std::bitset<width>(0b0000'0000);
-  std::bitset<width> rhs2 = std::bitset<width>(0b0000'1111);
-  EXPECT_TRUE( op == rhs1 );
-  EXPECT_TRUE( op != rhs2 );
+TEST_F(EllieOpcodeTest, UnmaskedComparisonShouldPass) {
+  EXPECT_TRUE(  op_w8_nomask == bs_w8_zero );
+  EXPECT_FALSE( op_w8_nomask != bs_w8_zero );
+  EXPECT_TRUE(  op_w8_nomask != bs_w8_lowbits );
+  EXPECT_FALSE( op_w8_nomask == bs_w8_lowbits );
+  EXPECT_TRUE(  op_w8_nomask != bs_w8_highbits );
+  EXPECT_FALSE( op_w8_nomask == bs_w8_highbits );
 }
 
-TEST(EllieOpcodeTest, MaskedComparisonShouldPass) {
-  const size_t      width = 8;
-  ellie::op<width>     op = ellie::op<width>("XXX", 0b0000'0000, 0b1111'0000);
-  std::bitset<width> rhs1 = std::bitset<width>(0b0000'0000);
-  std::bitset<width> rhs2 = std::bitset<width>(0b0000'1111);
-  std::bitset<width> rhs3 = std::bitset<width>(0b0001'1111);
-  EXPECT_TRUE( op == rhs1 );
-  EXPECT_TRUE( op == rhs2 );
-  EXPECT_TRUE( op != rhs3 );
+TEST_F(EllieOpcodeTest, MaskedComparisonShouldPass) {
+  EXPECT_TRUE(  op_w8_masklow == bs_w8_zero );
+  EXPECT_FALSE( op_w8_masklow != bs_w8_zero );
+  EXPECT_TRUE(  op_w8_masklow == bs_w8_lowbits );
+  EXPECT_FALSE( op_w8_masklow != bs_w8_lowbits );
+  EXPECT_TRUE(  op_w8_masklow != bs_w8_highbits );
+  EXPECT_FALSE( op_w8_masklow == bs_w8_highbits );
 }
 
-TEST(EllieOpcodeTest, InspectShouldCreateString) {
-  const size_t      width = 8;
-  ellie::op<width>     op = ellie::op<width>("XXX", 0b0000'0000, 0b1111'0000);
-  std::string  s_expected = "<ellie::op XXX value:0b00000000 mask:0b11110000 size: 8 bits>";
-  EXPECT_EQ(op.inspect(), s_expected);
+TEST_F(EllieOpcodeTest, InspectShouldCreateString) {
+  EXPECT_EQ(op_w8_masklow.inspect(), op_w8_topmask_str);
 }

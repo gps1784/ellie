@@ -33,7 +33,7 @@ namespace ellie {
     bool     operator==(const std::bitset<N>&) const;
     bool     operator!=(const std::bitset<N>&) const;
     std::string inspect(void) const;
-    const size_t   size(void);
+    const size_t   size(void) const;
 
   protected:
   private:
@@ -67,7 +67,7 @@ namespace ellie {
   }
 
   template<size_t N>
-  const size_t op<N>::size(void) {
+  const size_t op<N>::size(void) const {
     return this->m_bs_value.size();
   }
 
