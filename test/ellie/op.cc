@@ -10,13 +10,13 @@
 
 TEST(EllieOpcodeTest, SizeShouldBe8) {
   const size_t  width = 8;
-  ellie::op<width> op = ellie::op<width>();
+  ellie::op<width> op = ellie::op<width>("NUL", 0b0000);
   EXPECT_EQ(width, op.size());
 }
 
 TEST(EllieOpcodeTest, SizeShouldBe16) {
   const size_t  width = 16;
-  ellie::op<width> op = ellie::op<width>();
+  ellie::op<width> op = ellie::op<width>("NUL", 0b0000);
   EXPECT_EQ(width, op.size());
 }
 
